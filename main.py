@@ -5,9 +5,27 @@ from gemini import extract_invoice_data
 from fastapi import Body
 from fastapi.responses import StreamingResponse
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML
+# from weasyprint import HTML
 from fastapi.responses import HTMLResponse
 import io
+
+from io import BytesIO
+from xhtml2pdf import pisa
+
+
+def generate_pdf(html_content: str) -> bytes:
+    pdf_buffer = BytesIO()
+
+    result = pisa.CreatePDF(
+        src=html_content,
+        dest=pdf_buffer,
+        encoding="utf-8"
+    )
+
+    if result.err:
+        raise RuntimeError("Failed to generate PDF")
+
+    return pdf_buffer.getvalue()
 
 
 app = FastAPI()
@@ -36,7 +54,7 @@ async def generate_invoice(data: dict):
     template = env.get_template("invoice.html")
 
     html_content = template.render(**data)
-    pdf = HTML(string=html_content).write_pdf()
+    pdf = generate_pdf(html_content)
 
     return StreamingResponse(
         io.BytesIO(pdf),
