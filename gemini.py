@@ -33,14 +33,15 @@ Never return items as a string.
 {
   "companyName": string | null,
   "address": string | null,
-  "GSTIN No.": string | null,
+  "gstin": string | null,
   "date": string | null,
   "items": array | null,
   "totalAmount": string | null,
   "paymentMode": string | null,
   "paymentStatus": string | null,
-  "Client Name": string | null,
-  "Client Address": string | null
+  "clientName": string | null,
+  "clientAddress": string | null,
+  "currency": string | null
 }
 
 Rules:
