@@ -40,7 +40,7 @@ MAX_REQUESTS = 5
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://payshot.vercel.app", "https://www.payshot.entrext.in"],
+    allow_origins=["http://localhost:3000", "https://payshot.vercel.app", "https://www.payshot.entrext.in", "https://payshot-backend.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
