@@ -17,6 +17,7 @@ class InvoiceData(BaseModel):
 
     items: List[InvoiceItem] = []
 
-    gst: Optional[str] = None
+    gstin: Optional[str] = None
     paymentMode: Optional[str] = None
     paymentStatus: Optional[str] = None
+    currency: Optional[str] = "$"

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from gemini import extract_invoice_data
@@ -8,6 +8,8 @@ from jinja2 import Environment, FileSystemLoader
 # from weasyprint import HTML
 from fastapi.responses import HTMLResponse
 import io
+import time
+from collections import defaultdict
 
 from io import BytesIO
 from xhtml2pdf import pisa
@@ -30,6 +32,12 @@ def generate_pdf(html_content: str) -> bytes:
 
 app = FastAPI()
 
+# Rate limiting storage
+# Map: IP -> List[timestamp]
+request_counts = defaultdict(list)
+RATE_LIMIT_DURATION = 15 * 60  # 15 minutes in seconds
+MAX_REQUESTS = 5
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "https://payshot.vercel.app", "https://www.payshot.entrext.in"],
@@ -39,7 +47,25 @@ app.add_middleware(
 )
 
 @app.post("/upload")
-async def upload_images(images: List[UploadFile] = File(...)):
+async def upload_images(request: Request, images: List[UploadFile] = File(...)):
+    # Rate Limiting Logic
+    client_ip = request.client.host
+    current_time = time.time()
+    
+    # Filter out old timestamps
+    request_counts[client_ip] = [
+        t for t in request_counts[client_ip] 
+        if current_time - t < RATE_LIMIT_DURATION
+    ]
+    
+    if len(request_counts[client_ip]) >= MAX_REQUESTS:
+        raise HTTPException(
+            status_code=429, 
+            detail="Rate limit exceeded. You can only generate 5 invoices every 15 minutes."
+        )
+        
+    request_counts[client_ip].append(current_time)
+
     try:
         image_bytes = [await img.read() for img in images]
         return extract_invoice_data(image_bytes)

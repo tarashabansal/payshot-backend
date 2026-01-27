@@ -1,164 +1,257 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8" />
   <style>
-    html, body {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        }
-
     @page {
       size: A4;
-      margin: 40px;
+      margin: 1cm;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+      font-family: Helvetica, Arial, sans-serif;
       color: #333;
-      font-size: 12px;
-    }
-    .invoice {
-    width: 210mm;
-    background: white;
-    padding: 32px; /* ⬆️ main internal padding */
-    box-sizing: border-box;
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0;
+      padding: 20px;
     }
 
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 24px;
+    /* Layout Tables */
+    table.layout-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
     }
 
-    .logo {
-      border: 2px solid #c7d2fe;
-      color: #2563eb;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-weight: 600;
+    table.layout-table td {
+      vertical-align: top;
+      padding: 0;
     }
 
-    .details {
-    display: flex;
-    justify-content: space-between;
-    gap: 32px;
-    margin-bottom: 32px; /* ⬆️ space before table */
+    /* Header */
+    .header-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #10b981;
+      /* Emerald 500 */
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header-meta {
+      text-align: right;
+    }
+
+    /* Client/Company Boxes */
+    .box-container {
+      width: 100%;
     }
 
     .box {
-    border: 1px dashed #e5e7eb;
-    padding: 20px; /* ⬆️ inner box padding */
-    width: 48%;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      width: 45%;
     }
 
-    .label {
+    .box-title {
       font-size: 11px;
+      text-transform: uppercase;
       color: #64748b;
-      margin-bottom: 6px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .box-content {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Items Table */
+    table.items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+
+    table.items-table th {
+      background-color: #1e293b;
+      color: #ffffff;
+      padding: 12px;
+      text-align: left;
+      font-size: 12px;
       text-transform: uppercase;
     }
 
-    .title {
-      font-weight: 600;
-      margin-bottom: 4px;
+    table.items-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
     }
 
-    .meta {
-      margin-bottom: 24px;
-    }
-    table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    margin-top: 24px;
-    margin-bottom: 40px;
+    table.items-table tr:last-child td {
+      border-bottom: none;
     }
 
-    th {
-    background: #f8fafc;
-    padding: 14px 12px; /* ⬆️ header padding */
-    font-size: 12px;
-    border-bottom: 1px solid #e5e7eb;
+    /* Summary */
+    .summary-table {
+      width: 100%;
+      margin-top: 20px;
     }
 
-    td {
-    padding: 14px 12px; /* ⬆️ row padding */
-    border-bottom: 1px solid #e5e7eb;
-    vertical-align: top;
-    }
-
-    .summary {
-      width: 260px;
-      margin-left: auto;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    .summary-row.total {
-      font-weight: 700;
-    }
-
-    .note {
-      text-align: center;
-      margin-top: 48px;
+    .summary-label {
+      text-align: right;
+      padding-right: 20px;
+      font-weight: bold;
       color: #64748b;
-      font-size: 11px;
+    }
+
+    .summary-value {
+      text-align: right;
+      width: 150px;
+      font-weight: bold;
+      font-size: 16px;
+      color: #0f172a;
+    }
+
+    /* Payment Info & Footer */
+    .footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px dashed #e2e8f0;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .status-paid {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-pending {
+      background: #fef9c3;
+      color: #854d0e;
     }
   </style>
 </head>
 
 <body>
-  <div class="invoice">
 
-    <div class="details">
-      <div class="box">
-        <div class="title">{{ companyName }}</div>
-        <div>{{ address }}</div>
-      </div>
+  <!-- Header Section -->
+  <table class="layout-table">
+    <tr>
+      <td>
+        <div class="header-title">INVOICE</div>
+        <div style="color: #64748b; margin-top: 5px;">#{{ date | replace(" ", "") | replace(",", "") }}</div>
+      </td>
+      <td class="header-meta">
+        <div><strong>Date:</strong> {{ date }}</div>
+        {% if gstin %}
+        <div style="margin-top: 4px;"><strong>GSTIN:</strong> {{ gstin }}</div>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
 
-      <div class="box">
-        <div class="title">{{ clientName }}</div>
-        <div>{{ clientAddress }}</div>
-      </div>
-    </div>
+  <!-- Addresses -->
+  <table class="layout-table">
+    <tr>
+      <td style="width: 48%;">
+        <div class="box">
+          <div class="box-title">From</div>
+          <div class="box-content">
+            <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px;">{{ companyName }}</div>
+            <div style="color: #475569;">{{ address }}</div>
+          </div>
+        </div>
+      </td>
+      <td style="width: 4%;"></td> <!-- Spacer -->
+      <td style="width: 48%;">
+        <div class="box">
+          <div class="box-title">Bill To</div>
+          <div class="box-content">
+            <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px;">{{ clientName }}</div>
+            <div style="color: #475569;">{{ clientAddress }}</div>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
 
-    <div class="meta">
-      <strong>Invoice Date:</strong> {{ date }}
-    </div>
-
-    <table>
+  <!-- Items -->
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width: 50%;">Description</th>
+        <th style="text-align: center; width: 15%;">Qty</th>
+        <th style="text-align: right; width: 15%;">Rate</th>
+        <th style="text-align: right; width: 20%;">Amount</th>
+      </tr>
+    </thead>
     <tbody>
-    {% for item in items %}
-        <tr>
-            <td>{{ item.description }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ "%.2f"|format(item.rate) }}</td>
-            <td>{{ "%.2f"|format(item.quantity * item.rate) }}</td>
-        </tr>
-    {% endfor %}
+      {% for item in items %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td style="text-align: center;">{{ item.quantity }}</td>
+        <td style="text-align: right;">{{ currency }} {{ item.rate }}</td>
+        <td style="text-align: right;">{{ currency }} {{ item.quantity * item.rate }}</td>
+      </tr>
+      {% endfor %}
     </tbody>
+  </table>
 
+  <!-- Totals -->
+  <table class="summary-table">
+    <tr>
+      <td></td> <!-- Spacer -->
+      <td class="summary-label">Total Amount</td>
+      <td class="summary-value" style="background: #f1f5f9; padding: 10px; border-radius: 6px;">
+        {{ currency }} {{ subtotal }}
+      </td>
+    </tr>
+  </table>
+
+  <!-- Payment Info -->
+  {% if paymentMode or paymentStatus %}
+  <div style="margin-top: 30px;">
+    <table class="layout-table" style="width: auto;">
+      {% if paymentMode %}
+      <tr>
+        <td style="padding-right: 15px; color: #64748b; font-weight: bold;">Payment Mode:</td>
+        <td>{{ paymentMode }}</td>
+      </tr>
+      {% endif %}
+      {% if paymentStatus %}
+      <tr>
+        <td style="padding-right: 15px; color: #64748b; font-weight: bold;">Status:</td>
+        <td>
+          {{ paymentStatus }}
+        </td>
+      </tr>
+      {% endif %}
     </table>
-
-    
-      
-      <div class="summary-row total">
-        <span>Total</span>
-        <span>{{ subtotal }}</span>
-      </div>
-    </div>
-
-    <div class="note">Created using PayShot. Visit payshot.entrext.in for more info.
-    </div>
   </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Thank you for your business!</p>
+    <p style="font-size: 10px; margin-top: 5px;">Generated by PayShot • payshot.entrext.in</p>
+  </div>
+
 </body>
+
 </html>
