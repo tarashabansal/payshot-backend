@@ -15,7 +15,10 @@ from pydantic import BaseModel, EmailStr
 import requests
 from io import BytesIO
 from xhtml2pdf import pisa
+from dotenv import load_dotenv
 
+load_dotenv()
+    
 SUPABASE_URL="https://ldewwmfkymjmokopulys.supabase.co/functions/v1/submit-support"
 FORM_SECRET= os.getenv("FORM_SECRET")  # Replace with your actual form secret
 
