@@ -9,11 +9,15 @@ from jinja2 import Environment, FileSystemLoader
 from fastapi.responses import HTMLResponse
 import io
 import time
+import os
 from collections import defaultdict
-
+from pydantic import BaseModel, EmailStr
+import requests
 from io import BytesIO
 from xhtml2pdf import pisa
 
+SUPABASE_URL="https://ldewwmfkymjmokopulys.supabase.co/functions/v1/submit-support"
+FORM_SECRET= os.getenv("FORM_SECRET")  # Replace with your actual form secret
 
 def generate_pdf(html_content: str) -> bytes:
     pdf_buffer = BytesIO()
@@ -40,7 +44,7 @@ MAX_REQUESTS = 5
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://payshot.vercel.app", "https://www.payshot.entrext.in", "https://payshot.entrext.in", "https://payshot-backend.vercel.app"],
+    allow_origins=["http://localhost:3000", "https://www.payshot.entrext.in", "https://payshot.entrext.in"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -99,3 +103,37 @@ async def invoice_preview(data: dict):
     env = Environment(loader=FileSystemLoader("templates"))
     template = env.get_template("invoice.html")
     return template.render(**data)
+
+
+class SupportRequest(BaseModel):
+    product: str
+    category: str
+    message: str
+    user_email: EmailStr
+    metadata: dict | None = None
+
+
+@app.post("/support")
+def submit_support(payload: SupportRequest):
+    response = requests.post(
+        SUPABASE_URL,
+        headers={
+            "Content-Type": "application/json",
+            "x-form-secret": FORM_SECRET
+        },
+        json=payload.dict()
+    )
+
+    if response.status_code == 429:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many submissions. Try again later."
+        )
+
+    if not response.ok:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return response.json()
