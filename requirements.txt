@@ -14,7 +14,10 @@ python-dotenv==1.2.1
 python-multipart==0.0.21
 
 
-
+fastapi
+pydantic[email]
+requests
+python-dotenv
 
 # --------------------
 # Google Gemini (ONLY what you need)
